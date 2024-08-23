@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Add Blog Post</title>
+    <style>
+        /* Styling here */
+    </style>
+</head>
+<body>
+    <h1>Add New Blog Post</h1>
+    <form id="postForm">
+        <label for="title">Post Title:</label>
+        <input type="text" id="title" name="title" required>
+        <label for="content">Content:</label>
+        <textarea id="content" name="content" required></textarea>
+        <button type="submit">Add Post</button>
+    </form>
+    <p id="status"></p>
+    <script>
+        document.getElementById('postForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const title = document.getElementById('title').value;
+            const content = document.getElementById('content').value;
+            const fileName = title.replace(/\s+/g, '-').toLowerCase() + '.md';
+            const fileContent = btoa(`# ${title}\n\n${content}`);
+            const response = await fetch(`https://api.github.com/repos/YOUR_USERNAME/YOUR_REPO/contents/posts/${fileName}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': 'token YOUR_PERSONAL_ACCESS_TOKEN',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: `Add new post: ${title}`,
+                    content: fileContent
+                })
+            });
+            const status = document.getElementById('status');
+            if (response.ok) {
+                status.textContent = 'Post added successfully!';
+                status.style.color = 'green';
+            } else {
+                status.textContent = 'Error adding post. Check your settings.';
+                status.style.color = 'red';
+            }
+        });
+    </script>
+</body>
+</html>
